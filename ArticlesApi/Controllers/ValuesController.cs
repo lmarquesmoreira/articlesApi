@@ -14,33 +14,26 @@ namespace ArticlesApi.Controllers
     public class ValuesController : Controller
     {
         private static DocumentClient primaryClient = Settings.GetDocumentClient(DbType.Primary);
-        private static DocumentClient seccondClient = Settings.GetDocumentClient(DbType.Second); 
+        private static DocumentClient secondClient = Settings.GetDocumentClient(DbType.Second); 
         private ItemService _service;
 
         public ValuesController() {
             this._service = new ItemService();
         }
 
-        // GET api/values
         [HttpGet]
-        public IEnumerable<Item> Get()
-        {
-            return _service.Get(primaryClient, seccondClient);
-            // var location = System.Net.Dns.GetHostName();
-            // return new string[] { 
-            //     primaryClient != null ? "master client": "false 01", 
-            //     seccondClient != null ? "seccond client": "false 02", 
-            //     $"location is {location}"
-            // };
-        }
+        public IEnumerable<Item> Get() =>  _service.Get(primaryClient, secondClient);
 
-        // POST api/values
+        [HttpGet]
+        [Route("detailed")]
+        public IEnumerable<dynamic> GetDetailed() =>  _service.GetDetailed(primaryClient, secondClient);
+
         [HttpPost]
         public async Task<ActionResult> Post([FromBody]Item value, [FromQuery] int location = 0)
         {
             var client = primaryClient;
             if (location == 1){
-                client = seccondClient;
+                client = secondClient;
             }
 
             var result = await _service.Insert(client, value);

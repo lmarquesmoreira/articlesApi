@@ -55,6 +55,12 @@ namespace ArticlesApi.Services {
             return results.AsEnumerable<Item>();
         }
 
+        public dynamic GetDetailed(DocumentClient primaryClient, DocumentClient secondaryClient) {
+            return from p in Get(primaryClient, secondaryClient) group p by p.location into g select new {
+                location = g.Key, data = g.ToList()
+            };
+        }
+
         private void ExecuteQuery( DocumentClient client, HashSet<Item> results )
         {
             FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1 };
